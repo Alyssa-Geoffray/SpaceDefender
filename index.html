@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Orbitron" rel="stylesheet">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Space Defender</title>
+</head>
+<style>
+    * {
+        background: url('galaxy.jpg') center fixed;
+        background-size: cover;
+        font-family: 'orbitron', cursive;
+    }
+
+    #game {
+        width: 600px;
+        height: 600px;
+        padding-left: 90px;
+        padding-right: 10px;
+        padding-top: 10px;
+        padding-bottom: -20px;
+        margin-top: 20px;
+        border: 20px ridge lime;
+        background: black;
+    }
+
+    #instructions {
+        color: lime;
+        background: black;
+        opacity: .7;
+    }
+
+    #stars {
+        float: right;
+    }
+</style>
+
+<body>
+
+    <center>
+   
+        <div id='instructions'>
+
+            Use the arrow keys to navigate in all directions through space. Shoot lasers with the space key and kill as
+            many enemy ships as you can before they defeat you!
+        </div>
+
+
+        <!-- Game is embeded here     <img src='sparkles.gif' width='50px' id='stars'> -->
+        <embed id='game' src="gameOne.html">
+
+    </center>
+
+
+
+</body>
+
+</html>

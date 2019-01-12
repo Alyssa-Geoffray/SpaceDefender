@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Space Defender</title>
+    <link href="https://fonts.googleapis.com/css?family=Cinzel|Orbitron|Permanent+Marker|Yeon+Sung" rel="stylesheet">
+    <!-- <script src="https://code.jquery.com/jquery-1.10.2.js"></script> -->
+
+
+
+    <style>
+
+
+        #player {
+            width: 60px;
+            height: 60px;
+            position: absolute;
+        }
+
+        #background {
+            background: url("spaceball.gif") center bottom;
+            background-size: cover;
+            width: 500px;
+            height: 500px;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            margin-left: 20px;
+        }
+
+        .laser {
+            /* background: rgb(180, 180, 236); */
+            background: yellow;
+            width: 2px;
+            height: 30px;
+            position: absolute;
+        }
+
+        .enemy {
+            background: url("enemyShip50x44down.png");
+            width: 50px;
+            height: 44px;
+            position: absolute;
+        }
+
+        #score {
+            color: yellow;
+            font-size: 14pt;
+            font-family: "orbitron", sans-serif;
+            position: absolute;
+            left: 30px;
+            top: 20px;
+            visibility: visible;
+        }
+        #kills {
+            color: rgb(170, 170, 233);
+            font-size: 14pt;
+            font-family: "orbitron", sans-serif;
+            position: absolute;
+            left: 30px;
+            top: 40px;
+            visibility: visible;
+        }
+
+        #playerLoss {
+            color: yellow;
+            font-size: 70px;
+            font-family: "orbitron", sans-serif, bold;
+            position: absolute;
+            left: 35px;
+            top: 200px;
+            visibility: hidden;
+        }
+
+        #endscreen {
+            left: 0;
+            top: 0;
+            margin-left: 20px;
+            visibility: hidden;
+            position: absolute;
+        }
+
+        #finalscore {
+            color: rgb(223, 223, 102);
+            top: 300px;
+            left: 270px;
+            text-align: right;
+            visibility: hidden;
+            position: absolute;
+            font-family: "orbitron", sans-serif;
+            font-size: 20px;
+            line-height: 30%;
+        }
+        #finalkills {
+            font-family: "yeon sung";
+            color: rgb(239, 239, 255);
+            font-size: 30px;
+            left: 270px;
+            /* text-align: right; */
+            top: 320px;
+            visibility: hidden;
+            position: absolute;
+
+        }
+
+        #start {
+            width: 150px;
+            margin-top: 501px;
+            margin-left: 185px;
+            background-color: rgb(37, 6, 37);
+            color: lime;
+            border-style: double;
+            border-color: rgb(18, 95, 18);
+            font-family: "orbitron", sans-serif;
+                }
+
+         #start:hover {
+             background-color: rgb(18, 95, 18);
+             color: lime;
+             border-color: lime;
+             opacity: 20%;
+             font-family: "orbitron", sans-serif;
+         };    
+
+
+/* <!-- practice code, maybe need to remove --> */
+#restartGame {
+            width: 150px;
+            margin-top: 501px;
+            margin-left: 185px;
+            background-color: rgb(37, 6, 37);
+            color: lime;
+            border-style: double;
+            border-color: rgb(18, 95, 18);
+            font-family: "orbitron", sans-serif;
+            visibility: hidden;
+                };
+
+         #name {
+             font-family: "orbitron", sans-serif;
+             color: rgb(30, 9, 54);
+             width: 100px;
+             margin-top: 10px;
+             /* display: none; */
+         }
+         #userName {
+             background-color: rgb(193, 248, 193);
+             color: blue;
+             font-family: "orbitron", sans-serif;
+             width: 380px;
+             margin-top: 10px;
+             border: rgb(30, 9, 54) 2px inset;
+             /* display: none; */
+         }
+         #nameValue {
+             background-color: blueviolet;
+             border: rgb(161, 240, 161) 1px ridge;
+             color: rgb(161, 240, 161);
+             width: 50px;
+             margin-top: 10px;
+            /* display: none; */
+         }
+    #submitUserName {
+        width: 500px;
+        /* visibility: hidden; */
+        display: none;
+
+    }
+
+    </style>
+</head>
+
+<body>
+
+    <div id="stuff">
+        <div id="background"></div>
+        <img id="player" src="spaceship60.png">
+        <div class="laser" id="laser0"></div>
+        <div class="laser" id="laser1"></div>
+        <div class="laser" id="laser2"></div>
+        <div id="score"></div>
+        <div id="kills"></div>
+        <img id="endscreen" src="spacegifblue500.gif">
+        <div id="playerLoss">Game Over</div>
+        <div id="finalscore"></div>
+        <div id="finalkills"></div>
+
+    </div>
+
+
+
+    <button id="start" onclick="doStuff()">Play!</button>
+    <button id="restartGame" onclick="restartGame();"><img height="15px" width="15px" src="refresh.png" alt="Do-Over"></button>
+    <div id="submitUserName"><label id="name">Name: <input type="text" id="userName"></label>
+        <input type="button" id="nameValue" value="OK"></div>
+
+
+
+
+
+
+
+
+
+    <script type="text/javascript">
+
+
+        //storing a number of pixels to move an element for each key
+        var moveLeft = 37;
+        var moveUp = 38;
+        var moveRight = 39;
+        var moveDown = 40;
+        var spacebar = 32;
+        var userMovement = 3;
+
+        //set these variables to zero to begin
+        var lastLoopRun = 0;
+        var score = 0;
+        var kills = 0;
+        var iterations = 0;
+
+        var controller = new Object();
+        var enemies = new Array();
+
+
+        //creating variables to hold the player's coordinates, width and height
+        function createSprite(element, x, y, w, h) {
+            var result = new Object();
+            result.element = element;
+            result.x = x;
+            result.y = y;
+            result.w = w;
+            result.h = h;
+            return result;
+        };
+
+        //assigning directions to the keys
+        function toggleKey(keyCode, isPressed) {
+            if (keyCode == moveLeft) {
+                controller.left = isPressed;
+            }
+            if (keyCode == moveRight) {
+                controller.right = isPressed;
+            }
+            if (keyCode == moveUp) {
+                controller.up = isPressed;
+            }
+            if (keyCode == moveDown) {
+                controller.down = isPressed;
+            }
+            if (keyCode == spacebar) {
+                controller.space = isPressed;
+            }
+        };
+
+        //function to recognize when two things are not in the same place (use for enemy and player, or enemy and laser)
+        function intersects(a, b) {
+            //for example, x axis of thing one is less than the x axis of thing two plus thing two's width,
+            //y axis of thing one is less than the y axis of thing two plus thing two's height, etc...
+            return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+        };
+
+        //function to keep player inside bounds of play area
+        function checkPosition(sprite, ignoreY) {
+            if (sprite.x < 20) {
+                sprite.x = 20;
+            }
+            if (!ignoreY && sprite.y < 20) {
+                sprite.y = 20;
+            }
+            if (sprite.x + sprite.w > 480) {
+                sprite.x = 480 - sprite.w;
+            }
+            if (!ignoreY && sprite.y + sprite.h > 480) {
+                sprite.y = 480 - sprite.h;
+            }
+        };
+
+        //function to adjust player's position via pixels
+        function setPosition(sprite) {
+            var e = document.getElementById(sprite.element);
+            e.style.left = sprite.x + 'px';
+            e.style.top = sprite.y + 'px';
+        };
+
+        //function to move player by 'usermovment' value, 3px, in any direction when they press an arrow key
+        //or call laser function if they press the spacebar
+        //calls checkPosition() to ensure we are staying in bounds
+        function handleControls() {
+            if (controller.up) {
+                player.y -= userMovement;
+            }
+            if (controller.down) {
+                player.y += userMovement;
+            }
+            if (controller.left) {
+                player.x -= userMovement;
+            }
+            if (controller.right) {
+                player.x += userMovement;
+            }
+            if (controller.space) {
+                var laser = getFireableLaser();
+                if (laser) {
+                    laser.x = player.x + 9;
+                    laser.y = player.y - laser.h;
+                }
+            }
+            checkPosition(player);
+        };
+
+        //function to animate laser up
+        function getFireableLaser() {
+            var result = null;
+            for (var i = 0; i < gun.length; i++) {
+                if (gun[i].y <= -120) {
+                    result = gun[i];
+                }
+            }
+            return result;
+        };
+
+        //function to check if laser and enemy are intersecting
+        function getIntersectingLaser(enemy) {
+            var result = null;
+            for (var i = 0; i < gun.length; i++) {
+                if (intersects(gun[i], enemy)) {
+                    result = gun[i];
+                    break;
+                }
+            }
+            return result;
+        };
+
+
+        //functions for action when enemy intersects anything
+        function checkCollisions() {
+            for (var i = 0; i < enemies.length; i++) {
+                //if laser intersects an enemy
+                var laser = getIntersectingLaser(enemies[i]);
+                if (laser) {
+                    var element = document.getElementById(enemies[i].element);
+                    element.style.visibility = "hidden";
+                    element.parentNode.removeChild(element);
+                    enemies.splice(i, 1);
+                    i--;
+                    laser.y = -laser.h;
+                    score += 5305;
+                    kills += 1;
+                }
+                //if player intersects an enemy
+                else if (intersects(player, enemies[i])) {
+                    playerLoss();
+                }
+                //if enemy reaches the end of the screen without hitting anything
+                else if (enemies[i].y + enemies[i].h >= 500) {
+                    var element = document.getElementById(enemies[i].element);
+                    element.style.visibility = "hidden";
+                    element.parentNode.removeChild(element);
+                    enemies.splice(i, 1);
+                    i--;
+                }
+            }
+        };
+
+        //function runs when player loses by intersecting with enemy ship
+        function playerLoss() {
+            var element = document.getElementById(player.element);
+            element.style.visibility = "hidden";
+            element = document.getElementById("playerLoss");
+            element.style.visibility = "visible";
+            document.getElementById("finalscore").innerHTML = "SCORE: " + score;
+            saveScore = score;
+            document.getElementById("finalkills").innerHTML = "Kills: " + kills;
+            var element = document.getElementById("endscreen");
+            element.style.visibility = "visible";
+            var element = document.getElementById("finalscore");
+            element.style.visibility = "visible";
+            var element = document.getElementById("finalkills");
+            element.style.visibility = "visible";
+            var element = document.getElementById("restartGame");
+            element.style.visibility = "visible";
+        };
+
+        //set position for enemeies and lasers and display new score
+        function showSprites() {
+            setPosition(player);
+            for (var i = 0; i < gun.length; i++) {
+                setPosition(gun[i]);
+            }
+            for (var i = 0; i < enemies.length; i++) {
+                setPosition(enemies[i]);
+            }
+            var scoreElement = document.getElementById("score");
+            scoreElement.innerHTML = "SCORE: " + score;
+            var killElement = document.getElementById("kills");
+            killElement.innerHTML = "ENEMIES KILLED: " + kills;
+
+        };
+
+        //generate enemies randomly along x axis and move down y axis 
+        function updatePositions() {
+            for (var i = 0; i < enemies.length; i++) {
+                enemies[i].y += 4;
+                enemies[i].x += getRandom(7) - 3;
+                checkPosition(enemies[i], true);
+            }
+            for (var i = 0; i < gun.length; i++) {
+                gun[i].y -= 12;
+            }
+        };
+
+        //check how frequently to generate more enemies
+        function addEnemy() {
+            var interval = 50;
+            if (iterations > 1500) {
+                interval = 5;
+            } else if (iterations > 1000) {
+                interval = 20;
+            } else if (iterations > 500) {
+                interval = 35;
+            }
+
+            if (getRandom(interval) == 0) {
+                var elementName = "enemy" + getRandom(10000000);
+                var enemy = createSprite(elementName, getRandom(450), -40, 35, 35);
+
+                var element = document.createElement("div");
+                element.id = enemy.element;
+                element.className = "enemy";
+                document.children[0].appendChild(element);
+
+                enemies[enemies.length] = enemy;
+            }
+        };
+
+        function getRandom(maxSize) {
+            return parseInt(Math.random() * maxSize);
+        };
+
+        function loop() {
+            if (new Date().getTime() - lastLoopRun > 40) {
+                updatePositions();
+                handleControls();
+                checkCollisions();
+
+                addEnemy();
+
+                showSprites();
+
+                lastLoopRun = new Date().getTime();
+                iterations++;
+            }
+            setTimeout("loop();", 2);
+        };
+
+        // stops player sprite from moving when user stops pressing down on key
+        document.onkeydown = function (evt) {
+            toggleKey(evt.keyCode, true);
+        };
+
+        document.onkeyup = function (evt) {
+            toggleKey(evt.keyCode, false);
+        };
+
+        //creating player with bottom-center coordinates
+        var player = createSprite("player", 250, 460, 20, 20);
+
+        var gun = new Array();
+        for (var i = 0; i < 3; i++) {
+            gun[i] = createSprite("laser" + i, 0, -120, 2, 50);
+        };
+
+        //hide start button after game begins
+        function doStuff() {
+            var startBtn = document.getElementById("start");
+            startBtn.style.visibility = "hidden";
+            loop();
+        }
+
+        // <!-- optional code for saving score and username, for use with firebase. THIS NEEDS DB TO FUNCTION -->
+        // (function() {
+        //   // Use an input to show the current value and let
+        //   // the user set a new one
+
+        //   var input = document.getElementById("userName");
+
+        //   // Reading the value, which was store as "theValue"
+        //   if (localStorage && 'userName' in localStorage) {
+        //     input.value = localStorage.userName;
+        //   }
+
+        //   document.getElementById("nameValue").onclick = function () {
+        //     // Writing the value
+        //     localStorage && (localStorage.userName = input.value);
+        //     console.log(input.value + ", " + saveScore + " Game0");
+        //   };
+        // })();
+
+
+
+        //code to reload game (aka restart game) on click
+        function restartGame() {
+            location.reload();
+            loop();
+        };
+
+
+
+    </script>
+</body>
+
+</html>

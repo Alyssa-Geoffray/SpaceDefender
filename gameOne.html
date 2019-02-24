@@ -510,7 +510,34 @@
 
 
 
+       //AUDIO JS
+      window.addEventListener('keydown', function (e) {
+            var audio = document.querySelector(`audio[data-key="${e.keyCode}"]`);
+            var key = document.querySelector(`.key[data-key="${e.keyCode}"]`);
+            if (!audio) return; // stop function from running all together 
+            audio.currentTime = 0;
+            audio.play();
+            key.classList.add('playing');
+            console.log(keyCode);
+        });
+        function removeTransition(e) {
+            if (e.propertyName !== 'transform') return;
+
+            this.classList.remove('playing');
+        }
+        var keys = document.querySelectorAll('.key');
+        keys.forEach(key => key.addEventListener('transitionend', removeTransition));
+
     </script>
+
+    <!-- Sound Effects -->
+    <div class="keys">
+        <div data-key="32" class="key">
+            <span class="sound"></span>
+        </div>
+        <audio data-key="32" src="Laser.mp3"></audio>
+    </div>
+    
 </body>
 
 </html>
